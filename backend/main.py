@@ -1,5 +1,6 @@
 import json
 import asyncio
+from urllib.parse import urlparse
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import StreamingResponse
@@ -30,7 +31,10 @@ class SummarizeRequest(BaseModel):
     @field_validator("url")
     @classmethod
     def validate_url(cls, v: str) -> str:
-        if "youtube.com" not in v and "youtu.be" not in v:
+        parsed = urlparse(v)
+        hostname = (parsed.hostname or "").lower()
+        valid_hosts = {"www.youtube.com", "youtube.com", "youtu.be", "m.youtube.com"}
+        if parsed.scheme not in ("http", "https") or hostname not in valid_hosts:
             raise ValueError("URL must be a valid YouTube link.")
         return v
 
