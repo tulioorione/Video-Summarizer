@@ -4,6 +4,7 @@ from urllib.parse import urlparse
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import StreamingResponse
+from typing import Literal
 from pydantic import BaseModel, field_validator
 from dotenv import load_dotenv
 
@@ -26,7 +27,7 @@ app.add_middleware(
 
 class SummarizeRequest(BaseModel):
     url: str
-    model: str
+    model: Literal["claude", "gpt"]
 
     @field_validator("url")
     @classmethod
@@ -36,13 +37,6 @@ class SummarizeRequest(BaseModel):
         valid_hosts = {"www.youtube.com", "youtube.com", "youtu.be", "m.youtube.com"}
         if parsed.scheme not in ("http", "https") or hostname not in valid_hosts:
             raise ValueError("URL must be a valid YouTube link.")
-        return v
-
-    @field_validator("model")
-    @classmethod
-    def validate_model(cls, v: str) -> str:
-        if v not in ("claude", "gpt"):
-            raise ValueError("Model must be 'claude' or 'gpt'.")
         return v
 
 
