@@ -23,6 +23,8 @@ export default function App() {
     e.preventDefault();
     if (!url.trim() || loading) return;
 
+    controllerRef.current?.abort();
+
     setLoading(true);
     setResult(null);
     setError(null);
