@@ -12,6 +12,7 @@ venv/
 .venv/
 
 # Audio temp files
+backend/temp/
 *.mp3
 *.wav
 *.m4a
