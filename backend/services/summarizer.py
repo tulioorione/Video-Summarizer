@@ -27,7 +27,10 @@ Transcript:
 
 def summarize_with_claude(transcript: str) -> str:
     """Summarize using Claude claude-sonnet-4-5."""
-    client = Anthropic(api_key=os.environ["ANTHROPIC_API_KEY"])
+    api_key = os.environ.get("ANTHROPIC_API_KEY")
+    if not api_key:
+        raise ValueError("ANTHROPIC_API_KEY is not configured. Add it to your .env file.")
+    client = Anthropic(api_key=api_key)
 
     message = client.messages.create(
         model="claude-sonnet-4-5-20250514",
@@ -41,7 +44,10 @@ def summarize_with_claude(transcript: str) -> str:
 
 def summarize_with_gpt(transcript: str) -> str:
     """Summarize using GPT-4o."""
-    client = OpenAI(api_key=os.environ["OPENAI_API_KEY"])
+    api_key = os.environ.get("OPENAI_API_KEY")
+    if not api_key:
+        raise ValueError("OPENAI_API_KEY is not configured. Add it to your .env file.")
+    client = OpenAI(api_key=api_key)
 
     response = client.chat.completions.create(
         model="gpt-4o",
