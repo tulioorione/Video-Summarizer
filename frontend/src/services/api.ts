@@ -57,13 +57,17 @@ export function summarizeVideo(
           if (line.startsWith("event: ")) {
             currentEvent = line.slice(7).trim();
           } else if (line.startsWith("data: ")) {
-            const data = JSON.parse(line.slice(6));
-            if (currentEvent === "progress") {
-              callbacks.onProgress(data as ProgressEvent);
-            } else if (currentEvent === "done") {
-              callbacks.onDone(data as DoneEvent);
-            } else if (currentEvent === "error") {
-              callbacks.onError((data as ErrorEvent).message);
+            try {
+              const data = JSON.parse(line.slice(6));
+              if (currentEvent === "progress") {
+                callbacks.onProgress(data as ProgressEvent);
+              } else if (currentEvent === "done") {
+                callbacks.onDone(data as DoneEvent);
+              } else if (currentEvent === "error") {
+                callbacks.onError((data as ErrorEvent).message);
+              }
+            } catch {
+              callbacks.onError("Received malformed data from server.");
             }
             currentEvent = "";
           }
