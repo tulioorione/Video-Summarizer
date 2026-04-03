@@ -61,9 +61,12 @@ source venv/bin/activate  # Windows: venv\Scripts\activate
 pip install -r requirements.txt
 
 # Configurar variaveis de ambiente
+# IMPORTANTE: O arquivo .env.example e apenas um modelo/template.
+# A aplicacao le SOMENTE o arquivo .env (sem "example").
+# Copie o template e preencha com sua chave real:
 cp .env.example .env
-# Edite o .env e adicione sua chave:
-#   GEMINI_API_KEY=your_gemini_api_key_here
+# Edite o .env e substitua o valor pela sua chave:
+#   GEMINI_API_KEY=sua_chave_real_aqui
 
 # Iniciar o servidor
 uvicorn main:app --reload --port 8000
@@ -96,6 +99,12 @@ start-dev.bat
 Esse arquivo abre duas janelas: uma para o backend e outra para o frontend.
 
 ## Variaveis de Ambiente
+
+O projeto usa arquivos `.env` para armazenar configuracoes sensiveis (como chaves de API).
+
+- **`.env.example`** - E apenas um **modelo/template**. Ele mostra quais variaveis sao necessarias, mas **nao e lido pela aplicacao**.
+- **`.env`** - E o arquivo **real** que a aplicacao le. Voce deve criar este arquivo copiando o `.env.example` e preenchendo com seus valores reais.
+- O `.env` esta no `.gitignore` e **nunca sera commitado** no repositorio, protegendo suas chaves.
 
 ### Backend (`backend/.env`)
 
