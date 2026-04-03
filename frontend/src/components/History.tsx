@@ -31,8 +31,11 @@ export default function History({ entries, onSelect }: HistoryProps) {
   if (entries.length === 0) return null;
 
   return (
-    <div className="mt-10 max-w-2xl mx-auto">
-      <h3 className="text-sm font-semibold text-gray-500 uppercase tracking-wide mb-3">
+    <div className="mt-12 max-w-2xl mx-auto animate-fade-in-up" style={{ animationDelay: "0.3s" }}>
+      <h3 className="text-xs font-semibold text-gray-500 uppercase tracking-widest mb-4 flex items-center gap-2">
+        <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+          <path strokeLinecap="round" strokeLinejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
+        </svg>
         Resumos Recentes
       </h3>
       <div className="space-y-2">
@@ -40,17 +43,15 @@ export default function History({ entries, onSelect }: HistoryProps) {
           <button
             key={i}
             onClick={() => onSelect(entry)}
-            className="w-full text-left p-3 bg-white rounded-lg shadow-sm hover:shadow-md transition-shadow border border-gray-100 cursor-pointer"
+            className="w-full text-left p-4 glass rounded-xl glass-hover transition-all duration-300 hover:scale-[1.01] cursor-pointer group"
           >
-            <div className="flex justify-between items-center">
-              <span className="text-sm text-gray-700 truncate max-w-[80%]">
+            <div className="flex justify-between items-center gap-4">
+              <span className="text-sm text-gray-300 truncate group-hover:text-white transition-colors">
                 {entry.url}
               </span>
-              <div className="flex gap-2 items-center">
-                <span className="text-xs text-gray-400">
-                  {new Date(entry.timestamp).toLocaleDateString()}
-                </span>
-              </div>
+              <span className="text-xs text-gray-500 shrink-0">
+                {new Date(entry.timestamp).toLocaleDateString("pt-BR")}
+              </span>
             </div>
           </button>
         ))}
