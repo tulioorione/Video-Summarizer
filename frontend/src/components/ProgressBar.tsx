@@ -1,10 +1,10 @@
 import type { Step } from "../services/api";
 
 const STEPS: { key: Step; label: string }[] = [
-  { key: "downloading", label: "Downloading" },
-  { key: "transcribing", label: "Transcribing" },
-  { key: "summarizing", label: "Summarizing" },
-  { key: "done", label: "Done" },
+  { key: "downloading", label: "Baixando" },
+  { key: "transcribing", label: "Transcrevendo" },
+  { key: "summarizing", label: "Resumindo" },
+  { key: "done", label: "Concluído" },
 ];
 
 interface ProgressBarProps {

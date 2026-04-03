@@ -15,7 +15,7 @@ def _get_model():
 def transcribe_audio(file_path: str) -> str:
     """Transcribe an audio file using Whisper and delete it afterward."""
     if not os.path.exists(file_path):
-        raise FileNotFoundError(f"Audio file not found: {file_path}")
+        raise FileNotFoundError(f"Arquivo de áudio não encontrado: {file_path}")
 
     try:
         model = _get_model()

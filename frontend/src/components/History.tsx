@@ -1,6 +1,5 @@
 export interface HistoryEntry {
   url: string;
-  model: "claude" | "gpt";
   result: string;
   timestamp: number;
 }
@@ -34,7 +33,7 @@ export default function History({ entries, onSelect }: HistoryProps) {
   return (
     <div className="mt-10 max-w-2xl mx-auto">
       <h3 className="text-sm font-semibold text-gray-500 uppercase tracking-wide mb-3">
-        Recent Summaries
+        Resumos Recentes
       </h3>
       <div className="space-y-2">
         {entries.map((entry, i) => (
@@ -44,13 +43,10 @@ export default function History({ entries, onSelect }: HistoryProps) {
             className="w-full text-left p-3 bg-white rounded-lg shadow-sm hover:shadow-md transition-shadow border border-gray-100 cursor-pointer"
           >
             <div className="flex justify-between items-center">
-              <span className="text-sm text-gray-700 truncate max-w-[70%]">
+              <span className="text-sm text-gray-700 truncate max-w-[80%]">
                 {entry.url}
               </span>
               <div className="flex gap-2 items-center">
-                <span className="text-xs px-2 py-0.5 rounded-full bg-indigo-100 text-indigo-700 uppercase font-medium">
-                  {entry.model}
-                </span>
                 <span className="text-xs text-gray-400">
                   {new Date(entry.timestamp).toLocaleDateString()}
                 </span>

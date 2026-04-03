@@ -23,7 +23,6 @@ export interface SummarizeCallbacks {
 
 export function summarizeVideo(
   url: string,
-  model: "claude" | "gpt",
   callbacks: SummarizeCallbacks
 ): AbortController {
   const controller = new AbortController();
@@ -31,7 +30,7 @@ export function summarizeVideo(
   fetch(`${API_URL}/summarize`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ url, model }),
+    body: JSON.stringify({ url }),
     signal: controller.signal,
   })
     .then((response) => {
@@ -67,7 +66,7 @@ export function summarizeVideo(
                 callbacks.onError((data as ErrorEvent).message);
               }
             } catch {
-              callbacks.onError("Received malformed data from server.");
+              callbacks.onError("Dados malformados recebidos do servidor.");
             }
             currentEvent = "";
           }
@@ -87,7 +86,11 @@ export function summarizeVideo(
     })
     .catch((err) => {
       if (err.name !== "AbortError") {
-        callbacks.onError(err.message || "Connection failed");
+        const message =
+          err instanceof TypeError || err.message === "Failed to fetch"
+            ? `Nao foi possivel conectar ao backend em ${API_URL}. Verifique se a API esta rodando e se a URL configurada esta correta.`
+            : err.message || "Falha na conexao com o servidor.";
+        callbacks.onError(message);
       }
     });
 

@@ -1,69 +1,81 @@
 import os
-from anthropic import Anthropic
-from openai import OpenAI
 
-SUMMARY_PROMPT = """You are a video content analyst. Given the following transcript of a video, provide:
+from google import genai
+from google.genai import types
 
-1. **Title**: Infer a clear, descriptive title for the video.
-2. **Summary**: Write a well-structured summary in 2-3 paragraphs.
-3. **Key Points**: List 5-7 key takeaways as bullet points.
+SUMMARY_PROMPT = """Voce e um analista de conteudo de video. Dada a seguinte transcricao de um video, forneca:
 
-Format your response exactly as:
+1. **Titulo**: Infira um titulo claro e descritivo para o video.
+2. **Resumo**: Escreva um resumo bem estruturado em 2-3 paragrafos.
+3. **Pontos-chave**: Liste 5-7 principais conclusoes como topicos.
 
-# Title
-[inferred title]
+Formate sua resposta exatamente assim:
 
-## Summary
-[summary paragraphs]
+# Titulo
+[titulo inferido]
 
-## Key Points
-- [point 1]
-- [point 2]
+## Resumo
+[paragrafos do resumo]
+
+## Pontos-chave
+- [ponto 1]
+- [ponto 2]
 ...
 
-Transcript:
+Transcricao:
 {transcript}"""
 
 
-def summarize_with_claude(transcript: str) -> str:
-    """Summarize using Claude claude-sonnet-4-5."""
-    api_key = os.environ.get("ANTHROPIC_API_KEY")
+def _translate_provider_error(provider: str, exc: Exception) -> ValueError:
+    """Convert raw SDK errors into clearer local setup messages."""
+    message = str(exc).strip()
+    lower_message = message.lower()
+
+    if "insufficient_quota" in lower_message or "exceeded your current quota" in lower_message:
+        return ValueError(
+            f"A chave da {provider} esta sem quota/creditos disponiveis. "
+            "Verifique o billing da conta e os limites de uso antes de tentar novamente."
+        )
+
+    if "invalid_api_key" in lower_message or "incorrect api key" in lower_message:
+        return ValueError(
+            f"A chave da {provider} parece invalida. Confira o valor configurado no arquivo .env."
+        )
+
+    if "authentication" in lower_message or "unauthorized" in lower_message:
+        return ValueError(
+            f"Nao foi possivel autenticar com a {provider}. Revise a API key configurada."
+        )
+
+    if "rate limit" in lower_message or "too many requests" in lower_message:
+        return ValueError(
+            f"O limite de requisicoes da {provider} foi atingido. Aguarde um pouco e tente novamente."
+        )
+
+    return ValueError(f"Falha ao gerar resumo com {provider}: {message}")
+
+
+def summarize(transcript: str) -> str:
+    """Summarize using Gemini."""
+    api_key = os.environ.get("GEMINI_API_KEY")
     if not api_key:
-        raise ValueError("ANTHROPIC_API_KEY is not configured. Add it to your .env file.")
-    client = Anthropic(api_key=api_key)
+        raise ValueError("GEMINI_API_KEY nao esta configurada. Adicione no arquivo .env.")
 
-    message = client.messages.create(
-        model="claude-sonnet-4-5-20250514",
-        max_tokens=1500,
-        messages=[
-            {"role": "user", "content": SUMMARY_PROMPT.format(transcript=transcript)}
-        ],
-    )
-    return message.content[0].text
+    client = genai.Client(api_key=api_key)
 
+    try:
+        response = client.models.generate_content(
+            model="gemini-2.5-flash",
+            contents=SUMMARY_PROMPT.format(transcript=transcript),
+            config=types.GenerateContentConfig(
+                max_output_tokens=1500,
+                temperature=0.3,
+            ),
+        )
+    except Exception as exc:
+        raise _translate_provider_error("Gemini", exc) from exc
 
-def summarize_with_gpt(transcript: str) -> str:
-    """Summarize using GPT-4o."""
-    api_key = os.environ.get("OPENAI_API_KEY")
-    if not api_key:
-        raise ValueError("OPENAI_API_KEY is not configured. Add it to your .env file.")
-    client = OpenAI(api_key=api_key)
+    if not response.text:
+        raise ValueError("O Gemini nao retornou texto para este resumo.")
 
-    response = client.chat.completions.create(
-        model="gpt-4o",
-        max_tokens=1500,
-        messages=[
-            {"role": "user", "content": SUMMARY_PROMPT.format(transcript=transcript)}
-        ],
-    )
-    return response.choices[0].message.content
-
-
-def summarize(transcript: str, model: str) -> str:
-    """Route to the chosen LLM provider."""
-    if model == "claude":
-        return summarize_with_claude(transcript)
-    elif model == "gpt":
-        return summarize_with_gpt(transcript)
-    else:
-        raise ValueError(f"Unsupported model: {model}. Use 'claude' or 'gpt'.")
+    return response.text

@@ -10,7 +10,6 @@ import History, {
 
 export default function App() {
   const [url, setUrl] = useState("");
-  const [model, setModel] = useState<"claude" | "gpt">("claude");
   const [loading, setLoading] = useState(false);
   const [currentStep, setCurrentStep] = useState<Step | null>(null);
   const [progressMsg, setProgressMsg] = useState("");
@@ -31,7 +30,7 @@ export default function App() {
     setCurrentStep(null);
     setProgressMsg("");
 
-    controllerRef.current = summarizeVideo(url, model, {
+    controllerRef.current = summarizeVideo(url, {
       onProgress(data) {
         setCurrentStep(data.step);
         setProgressMsg(data.message);
@@ -39,12 +38,11 @@ export default function App() {
       onDone(data) {
         setResult(data.result);
         setCurrentStep("done");
-        setProgressMsg("Summary complete!");
+        setProgressMsg("Resumo concluído!");
         setLoading(false);
 
         const entry: HistoryEntry = {
           url,
-          model,
           result: data.result,
           timestamp: Date.now(),
         };
@@ -61,11 +59,10 @@ export default function App() {
 
   function handleHistorySelect(entry: HistoryEntry) {
     setUrl(entry.url);
-    setModel(entry.model);
     setResult(entry.result);
     setError(null);
     setCurrentStep("done");
-    setProgressMsg("Loaded from history");
+    setProgressMsg("Carregado do histórico");
   }
 
   return (
@@ -76,7 +73,7 @@ export default function App() {
             Video Summarizer
           </h1>
           <p className="text-gray-500">
-            Paste a YouTube URL, choose your AI model, and get a smart summary.
+            Cole uma URL do YouTube e receba um resumo inteligente com Gemini.
           </p>
         </header>
 
@@ -89,7 +86,7 @@ export default function App() {
               htmlFor="url"
               className="block text-sm font-medium text-gray-700 mb-1"
             >
-              YouTube URL
+              URL do YouTube
             </label>
             <input
               id="url"
@@ -103,34 +100,8 @@ export default function App() {
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              AI Model
-            </label>
-            <div className="flex gap-3">
-              <button
-                type="button"
-                onClick={() => setModel("claude")}
-                disabled={loading}
-                className={`flex-1 py-2.5 px-4 rounded-lg border-2 font-medium transition-all cursor-pointer ${
-                  model === "claude"
-                    ? "border-indigo-500 bg-indigo-50 text-indigo-700"
-                    : "border-gray-200 text-gray-500 hover:border-gray-300"
-                }`}
-              >
-                Claude
-              </button>
-              <button
-                type="button"
-                onClick={() => setModel("gpt")}
-                disabled={loading}
-                className={`flex-1 py-2.5 px-4 rounded-lg border-2 font-medium transition-all cursor-pointer ${
-                  model === "gpt"
-                    ? "border-emerald-500 bg-emerald-50 text-emerald-700"
-                    : "border-gray-200 text-gray-500 hover:border-gray-300"
-                }`}
-              >
-                GPT
-              </button>
+            <div className="rounded-lg border border-indigo-200 bg-indigo-50 px-4 py-3 text-sm text-indigo-900">
+              O resumo sera gerado com Gemini usando a chave configurada no backend.
             </div>
           </div>
 
@@ -139,7 +110,7 @@ export default function App() {
             disabled={loading || !url.trim()}
             className="w-full py-3 bg-indigo-600 text-white font-semibold rounded-lg hover:bg-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors cursor-pointer"
           >
-            {loading ? "Processing..." : "Summarize"}
+            {loading ? "Processando..." : "Resumir"}
           </button>
         </form>
 

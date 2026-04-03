@@ -12,7 +12,7 @@ def download_audio(url: str) -> str:
     output_path = os.path.join(output_dir, filename)
 
     ydl_opts = {
-        "format": "bestaudio/best",
+        "format": "bestaudio[ext=m4a]/bestaudio[ext=webm]/bestaudio/best",
         "outtmpl": f"{output_path}.%(ext)s",
         "postprocessors": [
             {
@@ -31,13 +31,13 @@ def download_audio(url: str) -> str:
     except yt_dlp.utils.DownloadError as e:
         error_msg = str(e).lower()
         if "private" in error_msg or "sign in" in error_msg:
-            raise ValueError("This video is private or requires authentication.")
+            raise ValueError("Este vídeo é privado ou requer autenticação.")
         if "not a valid url" in error_msg or "unsupported url" in error_msg:
-            raise ValueError("Invalid YouTube URL provided.")
-        raise ValueError(f"Failed to download video: {e}")
+            raise ValueError("URL do YouTube inválida.")
+        raise ValueError(f"Falha ao baixar o vídeo: {e}")
 
     mp3_path = f"{output_path}.mp3"
     if not os.path.exists(mp3_path):
-        raise ValueError("Audio extraction failed. The video may be unavailable.")
+        raise ValueError("Falha na extração do áudio. O vídeo pode estar indisponível.")
 
     return mp3_path
