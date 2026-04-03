@@ -1,5 +1,4 @@
 # Video Summarizer
-<img width="1360" height="1240" alt="arquitetura_video_summarizer" src="https://github.com/user-attachments/assets/fdd5f531-eddc-4407-9c3b-18f8cb62e3c6" />
 
 Aplicacao full-stack que recebe uma URL do YouTube, baixa o audio, transcreve com Whisper e gera um resumo inteligente usando Gemini.
 
